@@ -1,0 +1,23 @@
+[
+  "age",
+  "monthly_income_myr",
+  "monthly_expenses_myr",
+  "years_employed",
+  "num_dependents",
+  "existing_loans_count",
+  "existing_loans_total_myr",
+  "bankruptcy_history",
+  "late_payment_count_12m",
+  "credit_utilization_pct",
+  "savings_balance_myr",
+  "education_level_Bachelor",
+  "education_level_Diploma",
+  "education_level_Master",
+  "education_level_PhD",
+  "education_level_SPM",
+  "employment_status_contract",
+  "employment_status_employed",
+  "employment_status_retired",
+  "employment_status_self_employed",
+  "employment_status_unemployed"
+]

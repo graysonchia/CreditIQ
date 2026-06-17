@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Environment and secrets
+.env
+backend/.env
+*.env
+
+# Local databases and MLflow output
+mlflow.db
+mlruns/
+
+# Generated data and trained artifacts
+data/processed_*.csv
+saved_models/**/*.joblib
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
