@@ -19,6 +19,100 @@ CreditIQ is a full-stack credit intelligence platform for credit score predictio
 **ML:** XGBoost, LightGBM, scikit-learn, Optuna, MLflow, SHAP, imbalanced-learn  
 **Frontend:** React 18, TypeScript, Vite, Zustand, Axios, React Router, Recharts, Plotly.js, Vitest  
 
+## System Charts
+
+### Platform Architecture
+
+```mermaid
+flowchart LR
+    User[Analyst or Admin] --> UI[React TypeScript Dashboard]
+    UI --> API[FastAPI Backend]
+    API --> DB[(PostgreSQL)]
+    API --> Models[Saved Joblib Models]
+    API --> SHAP[SHAP Explainers]
+    Pipeline[ML Pipeline] --> Models
+    Pipeline --> Metrics[Model Metrics]
+    Metrics --> DB
+    Seeds[Seed Scripts] --> DB
+```
+
+### ML Training and Prediction Flow
+
+```mermaid
+flowchart TD
+    Raw[(PostgreSQL Tables)] --> Prep[Feature Engineering]
+    Prep --> Credit[Credit Score Dataset]
+    Prep --> Default[Loan Default Dataset + SMOTE]
+    Prep --> Fraud[Fraud Dataset + SMOTE]
+    Credit --> TrainCredit[Random Forest / XGBoost Regression]
+    Default --> TrainDefault[XGBoost / LightGBM Classification]
+    Fraud --> TrainFraud[LightGBM Classification]
+    TrainCredit --> Artifacts[model.joblib + features.json]
+    TrainDefault --> Artifacts
+    TrainFraud --> Artifacts
+    Artifacts --> Predict[FastAPI Prediction Service]
+    Predict --> Audit[(Prediction Audit Trail)]
+```
+
+### Core Data Model
+
+```mermaid
+erDiagram
+    CUSTOMERS ||--o{ TRANSACTIONS : has
+    CUSTOMERS ||--o{ LOAN_APPLICATIONS : applies
+    CUSTOMERS ||--o{ PREDICTIONS : receives
+    USERS ||--o{ PREDICTIONS : audits
+    MODEL_METRICS ||--o{ PREDICTIONS : version_context
+
+    CUSTOMERS {
+        int id
+        string customer_code
+        string full_name
+        float monthly_income_myr
+        float credit_utilization_pct
+        bool bankruptcy_history
+    }
+
+    PREDICTIONS {
+        int id
+        int customer_id
+        string prediction_type
+        float predicted_value
+        string predicted_label
+        json shap_values
+    }
+```
+
+### Dashboard Data Flow
+
+```mermaid
+sequenceDiagram
+    participant UI as React Dashboard
+    participant API as FastAPI
+    participant DB as PostgreSQL
+    participant ML as ML Services
+
+    UI->>API: GET /customers
+    API->>DB: Load paginated customer profiles
+    DB-->>API: Customer records
+    API-->>UI: Customer list
+
+    UI->>API: POST /predictions/loan-default
+    API->>ML: Align features and score model
+    ML-->>API: Probability, label, confidence
+    API->>ML: Generate SHAP explanation
+    API->>DB: Store prediction audit record
+    API-->>UI: Prediction result + SHAP payload
+```
+
+### Model Coverage
+
+| Model | Task | Algorithm Candidates | Output | Explainability |
+| --- | --- | --- | --- | --- |
+| Credit Score | Regression | Random Forest, XGBoost | Score from 300 to 850 | SHAP top feature impacts |
+| Loan Default | Classification | XGBoost, LightGBM | Default probability + label | SHAP risk breakdown |
+| Fraud Detection | Classification | LightGBM | Fraud probability + label | SHAP anomaly indicators |
+
 ## Project Structure
 
 ```text
